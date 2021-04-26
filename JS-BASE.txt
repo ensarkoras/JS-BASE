@@ -1,0 +1,139 @@
+Babel > es6/7 kodlarını Es5 e dönüştürür.
+Webpack > es6 js modüllerini bundle eder. Örneğin node.js de require kullanıyorsun.
+Bunu import a dönüştürür.
+
+NPM init -y 
+npm install webpack --save-dev 
+npm install webpack-cli --save-dev
+
+Webpack.config.js dosyasını oluşturdum. Bu bizim config dosyamız.
+
+
+Index.js de console.log('Hello Ensar') yazdık.
+
+package.json da dev script i ekledik.
+
+"scripts": {
+    "dev": "webpack"
+  },
+
+Npm run dev diyince bundle.js dosyası oluştu.
+
+Sonra people.js oluşturdum.
+
+module.exports = [
+    { name : 'Ensar' },
+    {name : 'Hümeyra'}
+]
+
+index.js de console.log(require('./people')) yazdım.
+
+index.html oluşturup içine  <script src="bundle.js"></script> verdim.
+
+Sonra npm run dev dediğimde artık people.js de bundle edildi.
+
+package.json da farklı script oluşturabilirsin.
+
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production" 
+
+
+Dist ve src klasörlerini oluşturduk. Bizim build edilmiş dosyalarımız dost de bulunacak.
+
+
+Webpack Dev Server
+
+Dosyalarımızda herhangi bir değişiklik olduğunda tekrar npm run dev ile tekrar çalıştırmaktansa
+Dosyalarda değişiklik olduğunda otomatik algılasın ve bundle.js dosyasının içinde bulunduğu bir
+index.html dosyası otomatik açılsın.
+
+npm install webpack-dev-server --save-dev ile projeye ekledik.
+
+Webpack.config de config yaptık. Bu şu demek dist klasörünü izliyor.
+
+devServer : {
+        contentBase: './dist'
+    }
+
+Ve script ekledik.
+
+"start" : "webpack serve --mode development --open"
+
+index.html de <script src="js/bundle.js"></script>
+
+Artık npm run start dediğimde server çalışacak. Herhangi bir değişiklik yapıldığında otomatik tekrar 
+Bundle edilir.
+
+
+Dist içine de biz otomatik index.html dosyasını oluşturmamız lazım.
+Bunun için;
+
+npm install html-webpack-plugin --save-dev
+
+webpack.config.js de config yaptık.
+
+    plugins : [
+        new HtmlWebpackPlugin({
+            filename : 'index.html',
+            template : './src/index.html'
+        })
+    ]
+
+Böylece src altındaki index.html den bir template oluşturduk.
+
+
+
+Webpack Babel (https://babeljs.io/setup#installation)
+
+npm install --save-dev babel-loader @babel/core
+
+Sonra webpack.config.js de config eklersin.
+
+module: {
+    rules: [
+      {
+        test: /\.m?js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
+      }
+    ]
+  }
+
+babel.config.json dosyasını oluştur.
+
+npm install @babel/preset-env --save-dev
+
+babel.config.json dosyasında;
+
+{
+  "presets": ["@babel/preset-env"]
+}
+
+Src altındaki index.js de aşağıdaki kodları yazdık.
+
+let name = 'Ensar Koras'
+
+const sayHello = () => {
+    console.log('Hello');
+}
+
+Nem run dev diyince yukarda yazdığımız kodlar aşağıdaki şekle çevrildi.
+
+eval("var name = 'Ensar Koras';\n\nvar sayHello = function sayHello() {\n  console.log('Hello');\n};\n\n//# sourceURL=webpack://JS-BASE/./src/js/index.js?");
+
+
+Async / await yapısını aktif etmek için babel-polyfill paketini yükledik.
+
+npm install babel-polyfill --save
+
+Ayrıca webpack.config e tanımladık.
+
+module.exports = {
+    entry: ['babel-polyfill','./src/js/index.js'],
+    
+
